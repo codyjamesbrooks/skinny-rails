@@ -21,6 +21,7 @@ ActiveRecord::Schema.define(version: 20161114002541) do
   end
 
   create_table "slugs", force: :cascade do |t|
+    
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
