@@ -7,9 +7,7 @@ gem 'pg', '~> 0.18'
 gem 'puma', '~> 3.0'
 gem 'sass-rails', '~> 5.0'
 gem 'uglifier', '>= 1.3.0'
-# gem 'therubyracer', platforms: :ruby
-
-# Use jquery as the JavaScript library
+gem 'uri'
 gem 'jquery-rails'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.5'
