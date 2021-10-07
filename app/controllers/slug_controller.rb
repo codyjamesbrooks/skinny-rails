@@ -4,37 +4,30 @@ class SlugController < ApplicationController
   end 
 
   def create
-    render json: { location: request.host }, status: 200
-    # if Slug.find_by( url: slug_params[:url])
-    #   # url exists in db
-    #   respond_with_slug
-    #   respond_to do |format|
-      
-    #   end
-    # else
-    #   # Create a unique slug
-    #   # Save the slug
-    #   # JSON response
-    # end 
-    
-    # redirect_to root_path
-    # # if @slug.save
+    @slug = Slug.new(url: request_url)
 
-    # #   redirect_to root_path, notice: "Sucessfull created Slug"
-    # # else
-    # #   redirect_to root_path, notice: "Failed to create Slug"
-    # # end    
+    if @slug.save
+      render json: { slug: "#{@slug.slug}", 
+                     'lookup_url': create_lookup_url(@slug.slug) },
+                     status: 201
+    elsif @slug.errors == :taken
+      correct_slug = Slug.find_by(url: @slug.url).slug
+      render json { 'lookup url': create_lookup_url(correct_slug) },
+                    status: 200
+    else
+      render json { error: @slug.errors.full_messages.first },
+                    status: 400
+    end
   end
   
   private
   
-  def slug_params
-    params.require(:slug).permit(:url)
+  def request_url
+    request.body.read.sub(/url=/, "")
   end
 
-  def create_slug( url )
-    url.parameterize[0, 5]
-  end
-
+  def create_lookup_url( slug ) 
+    "#{request.host}/#{slug}"
+  end 
 
 end
