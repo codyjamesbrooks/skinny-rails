@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
-  get'/' => 'slug#retrive'
-  post '/' => 'slug#create'
+  post '/', to: 'slug#create'
+  get'/:slug', to: 'slug#retrive'
+  
 end
  
