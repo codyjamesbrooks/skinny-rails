@@ -38,7 +38,7 @@ class SlugController < ApplicationController
     @slug = Slug.find_by(slug: params[:slug])
     
     if @slug
-      render json: { created_at: @slug.created_at
+      render json: { created_at: @slug.created_at,
                      lookups: @slug.lookups.count },
                      status: 200
     else
