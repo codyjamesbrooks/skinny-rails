@@ -4,8 +4,7 @@ class SlugController < ApplicationController
     @slug = Slug.find_by(slug: params[:slug])
     if @slug
       # Create Lookup, send full url in response header
-      Lookup.create({
-        slug_id: @slug.id,
+      @slug.lookups.create({
         ip_address: request.remote_ip,
         referrer: request.referrer
       })
@@ -18,24 +17,36 @@ class SlugController < ApplicationController
   end 
 
   def create
-    @slug = Slug.new(url: request_url)
-
-    if @slug.save
-      payload = 
+    url = request_url
+    @slug = Slug.find_by(url: url)
+    if @slug
       render json: { location: "#{request.domain}/#{@slug.slug}" },
-                     status: 201
-    end 
-
-    if @slug.errors == :taken
-      correct_slug = Slug.find_by(url: @slug.url).slug
-      render json: { lookup_url: "#{request.domain}/#{correct_slug}" }.to_json,
-                    status: 200
+                     status: 200
     else
-      render json: { error: @slug.errors.full_messages.first },
-                    status: 400
-    end
-  end
+      @slug = Slug.create(url: url)
+      if @slug.save
+        render json: { location: "#{request.domain}/#{@slug.slug}" },
+                        status: 200
+      else
+        render json: { error: "Invalid url submitted" },
+                       status: 400
+      end 
+    end 
+  end 
   
+  def stats
+    @slug = Slug.find_by(slug: params[:slug])
+    
+    if @slug
+      render json: { created_at: @slug.created_at
+                     lookups: @slug.lookups.count },
+                     status: 200
+    else
+      render json: { error: "Slug does not exist" },
+             status: 404
+    end 
+  end
+
   private
   
   def request_url
