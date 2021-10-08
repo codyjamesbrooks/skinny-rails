@@ -1,4 +1,5 @@
 class Slug < ApplicationRecord
+  has_many :lookups
   validates :url, presence: true, uniqueness: true, format: URI::regexp(%w[http https])
   validates :slug, presence: true
   before_validation :set_slug
