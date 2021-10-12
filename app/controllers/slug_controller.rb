@@ -1,5 +1,4 @@
-class SlugController < ApplicationController
-  skip_before_action :verify_authenticity_token
+class SlugController < ApplicationController  
   def index
     render json: Slug.all, status: 200
   end 
@@ -48,15 +47,4 @@ class SlugController < ApplicationController
              status: 404
     end 
   end
-
-  private
-  
-  def request_url
-    request.body.read.sub(/url=/, "")
-  end
-
-  def create_lookup_url( slug ) 
-    "#{request.host}/#{slug}"
-  end 
-
 end
