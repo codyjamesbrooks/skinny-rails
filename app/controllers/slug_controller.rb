@@ -20,15 +20,14 @@ class SlugController < ApplicationController
   end 
   
   def create
-    url = request_url
-    @slug = Slug.find_by(url: url)
+    @slug = Slug.find_by(url: request.params[:url])
     if @slug
-      render json: { location: "#{request.domain}/#{@slug.slug}" },
+      render json: { location: @slug.url },
                      status: 200
     else
-      @slug = Slug.create(url: url)
+      @slug = Slug.create(url: request.params[:url])
       if @slug.save
-        render json: { location: "#{request.domain}/#{@slug.slug}" },
+        render json: { location: @slug.url },
                         status: 200
       else
         render json: { error: "Invalid url submitted" },
