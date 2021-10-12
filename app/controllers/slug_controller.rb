@@ -1,21 +1,24 @@
 class SlugController < ApplicationController
   skip_before_action :verify_authenticity_token
+  def index
+    render json: Slug.all, status: 200
+  end 
+
   def retrive
     @slug = Slug.find_by(slug: params[:slug])
     if @slug
-      # Create Lookup, send full url in response header
-      @slug.lookups.create({
-        ip_address: request.remote_ip,
-        referrer: request.referrer
-      })
-      response.set_header("Location:", @slug.url) 
-      redirect_to @slug.url, status: 301
+      @lookup = @slug.lookups.new({ ip_address: request.remote_ip,
+                                    referrer: request.referrer })
+        if @lookup.save
+          response.set_header("Location:", @slug.url) 
+          redirect_to @slug.url, status: 301
+        end 
     else 
-      render json: { error: "Slug does not exist" }, 
+      render json: { error: "Slug does not exist or Lookup is invalid" }, 
              status: :not_found
     end 
   end 
-
+  
   def create
     url = request_url
     @slug = Slug.find_by(url: url)
