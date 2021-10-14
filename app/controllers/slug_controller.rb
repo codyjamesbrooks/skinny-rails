@@ -5,34 +5,33 @@ class SlugController < ApplicationController
 
   def retrive
     @slug = Slug.find_by(slug: params[:slug])
-    if @slug
-      @lookup = @slug.lookups.new({ ip_address: request.remote_ip,
-                                    referrer: request.referrer })
-        if @lookup.save
-          response.set_header("Location:", @slug.url) 
-          redirect_to @slug.url, status: 301
-        end 
-    else 
+
+    unless @slug
       render json: { error: "Slug does not exist or Lookup is invalid" }, 
-             status: :not_found
+      status: :not_found
+      return    
     end 
+
+    @slug.lookups.create!({ ip_address: request.remote_ip,
+                            referrer: request.referrer })
+    response.set_header("Location:", @slug.url) 
+    redirect_to @slug.url, status: 301
   end 
   
   def create
     @slug = Slug.find_by(url: request.params[:url])
     if @slug
-      render json: { location: @slug.url },
-                     status: 200
-    else
-      @slug = Slug.create(url: request.params[:url])
-      if @slug.save
-        render json: { location: @slug.url },
-                        status: 200
-      else
-        render json: { error: "Invalid url submitted" },
-                       status: 400
-      end 
-    end 
+      render json: { location: @slug.url }, status: 200
+      return
+    end
+
+    @slug ||= Slug.create(url: request.params[:url])
+    if @slug.save
+      render json: { location: @slug.url }, status: 201
+      return
+    end
+
+    render json: { error: "Invalid url submitted" }, status: 400
   end 
   
   def stats
