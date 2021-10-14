@@ -10,23 +10,29 @@ RSpec.describe "API", type: :request do
 
   describe 'POST /' do
     context 'with valid params' do
+      
+      before do
+        allow_any_instance_of(Slug::NaiveUrlValidator).to receive(:validate)
+      end
+  
       let(:slug) { create(:slug) }
 
       it 'creates a slug' do
-        expect {
-          post '/', params: {url: generate(:url)}, as: :json
-        }.to change(Slug, :count).by(1)
+        uri = generate(:uri)
+        post '/', params: {url: uri}, as: :json
         expect(response).to have_http_status(:created)
+        resp = JSON.parse(response.body)
+        expect(resp['location']).to include(uri)
       end
 
       it 'responds with a new location' do
-        url = generate(:url)
-        post '/', params: {url: url}, as: :json
+        uri = generate(:uri)
+        post '/', params: {url: uri}, as: :json
 
         expect(response.content_type).to eq('application/json')
 
         resp = JSON.parse(response.body)
-        expect(resp['location']).to eq(url)
+        expect(resp['location']).to eq(uri)
       end
 
       it 'responds with an existing location' do
@@ -57,6 +63,11 @@ RSpec.describe "API", type: :request do
   end
 
   describe 'GET /:slug' do
+
+    before do 
+      allow(UrlValidator).to receive(:validate_url) { true }
+    end 
+
     context 'with an existing slug' do
       it 'redirects to :url' do
         slug = create(:slug)
@@ -84,6 +95,11 @@ RSpec.describe "API", type: :request do
   end
 
   describe 'GET /stats/:slug' do
+
+    before do 
+      allow(UrlValidator).to receive(:validate_url) { true }
+    end 
+    
     context 'for an existing :slug' do
       it 'fetches lookups as JSON' do
         ct = 3
