@@ -1,5 +1,5 @@
 class Lookup < ApplicationRecord
-  class NiaveLookupValidator < ActiveModel::Validator
+  class NaiveLookupValidator < ActiveModel::Validator
     def validate( record )
       unless UrlValidator.validate_url(record.referrer)
         record.errors.add(:referrer, "is not a valid url")
@@ -9,7 +9,6 @@ class Lookup < ApplicationRecord
   
   belongs_to :slug
   validates :slug, presence: true
-  validates :referrer, presence: true
   validates :ip_address, presence: true, format: { with: Regexp.union(Resolv::IPv4::Regex, Resolv::IPv6::Regex), message: "is not a valid ip address"}
-  validates_with NiaveLookupValidator
+  validates_with NaiveLookupValidator
 end

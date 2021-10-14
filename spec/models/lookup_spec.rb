@@ -2,12 +2,11 @@ require 'rails_helper'
 
 RSpec.describe Lookup, type: :model do
   subject { create(:lookup) }
-  
+
   it { expect(subject).to be_valid }
 
   it { should validate_presence_of(:slug) }
   it { should validate_presence_of(:ip_address) }
-  it { should validate_presence_of(:referrer) }
   it { should belong_to(:slug) }
 
   it "rejects invalid ip addresses" do
