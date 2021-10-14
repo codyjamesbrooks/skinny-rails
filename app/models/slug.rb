@@ -1,7 +1,9 @@
 class Slug < ApplicationRecord
   class NaiveUrlValidator < ActiveModel::Validator
     def validate(record)
-      record.errors.add(:url, "is not a valid url") unless UrlValidator.validate_url(record.url)
+      unless UrlValidator.validate_url(record.url)
+        record.errors.add(:url, "is not a valid url")
+      end 
     end
   end
 
